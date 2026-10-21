@@ -1,0 +1,14 @@
+{
+    "name": "drakobot-dashboard-addon",
+    "version": "1.0.0",
+    "description": "Unofficial server monitoring dashboard addon (MongoDB + Socket.IO) for Drako Bot (archived test project)",
+    "main": "dashboardAddon.js",
+    "dependencies": {
+        "express": "^4.18.2",
+        "mongodb": "^4.17.2",
+        "socket.io": "^4.7.2",
+        "sqlite3": "^5.1.6"
+    },
+    "author": "Bigsmoke002",
+    "license": "MIT"
+}

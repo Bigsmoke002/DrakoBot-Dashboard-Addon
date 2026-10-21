@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Discord Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>Dashboard Menü</h2>
+      <ul class="tab-menu">
+        <li data-tab="live-events" class="active">Live Events</li>
+        <li data-tab="user-status">User Status</li>
+        <li data-tab="roles">Rollen</li>
+        <li data-tab="audit-log">Audit Log</li>
+        <li data-tab="channels">Channels</li>
+        <li data-tab="server-stats">Server Statistics</li>
+        <li data-tab="active">Aktive</li>
+        <li data-tab="user-activity-log">Benutzeraktivitäts-Log</li>
+        <li data-tab="all-users">Alle Benutzer</li>
+        <li data-tab="old-servers">Alte Server</li>
+        <li data-tab="bot-status">Bot Status</li>
+        <li data-tab="config-editor">Konfiguration</li>
+        <li data-tab="performance">Bot Performance</li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <!-- Einheitlich gestalteter Server Selector -->
+      <div class="server-selector">
+        <label for="server-selector">Server auswählen:</label>
+        <select id="server-selector"></select>
+      </div>
+
+      <!-- Live Events -->
+      <section id="live-events" class="tab-panel active">
+        <h2>Live Events</h2>
+        <div class="panel" id="live-events-panel">
+          <div id="log-list"></div>
+        </div>
+        <h3>Gespeicherte Logs laden</h3>
+        <div class="controls-container">
+          <select id="stored-log-type">
+            <option value="messageCreate">Neue Nachrichten</option>
+            <option value="messageDelete">Gelöschte Nachrichten</option>
+            <option value="guildMemberAdd">Mitglied beigetreten</option>
+            <option value="guildMemberRemove">Mitglied verlassen</option>
+            <option value="presenceUpdate">Statusänderungen</option>
+            <option value="usernameChange">Namensänderungen</option>
+            <option value="auditLog">Audit Log</option>
+          </select>
+          <button id="load-stored-logs" class="action-button">Gespeicherte Logs laden</button>
+          <button id="export-logs" class="action-button">Logs exportieren</button>
+        </div>
+        <div id="stored-log-list"></div>
+      </section>
+
+      <!-- User Status -->
+      <section id="user-status" class="tab-panel">
+        <h2>User Status</h2>
+        <div class="panel">
+          <div class="user-controls">
+            <div class="update-interval-control">
+              <label for="update-interval">Aktualisierung:</label>
+              <select id="update-interval">
+                <option value="10">10 Sekunden</option>
+                <option value="30">30 Sekunden</option>
+                <option value="60">60 Sekunden</option>
+                <option value="0">Aus</option>
+              </select>
+            </div>
+            <input type="text" id="user-search" placeholder="Suchen nach Name, ID, Status..." />
+            <select id="user-sort">
+              <option value="name-asc">Name A–Z</option>
+              <option value="name-desc">Name Z–A</option>
+              <option value="status-asc">Status (A–Z)</option>
+              <option value="status-desc">Status (Z–A)</option>
+            </select>
+          </div>
+          <div id="user-status-list"></div>
+        </div>
+      </section>
+
+      <!-- Rollen -->
+      <section id="roles" class="tab-panel">
+        <h2>Rollen Übersicht</h2>
+        <div class="panel">
+          <div id="roles-list"></div>
+        </div>
+      </section>
+
+      <!-- Audit Log -->
+      <section id="audit-log" class="tab-panel">
+        <h2>Audit Log</h2>
+        <div class="panel">
+          <div id="audit-log-list"></div>
+        </div>
+      </section>
+
+      <!-- Channels -->
+      <section id="channels" class="tab-panel">
+        <h2>Channels</h2>
+        <div class="panel" id="channels-list"></div>
+      </section>
+
+      <!-- Server Statistics -->
+      <section id="server-stats" class="tab-panel">
+        <h2>Server Statistics</h2>
+        <div class="panel" id="server-stats-data"></div>
+      </section>
+
+      <!-- Aktive -->
+      <section id="active" class="tab-panel">
+        <h2>Aktive Benutzer</h2>
+        <div class="panel">
+          <div class="active-overview">
+            <div class="active-section">
+              <h3>Voice Channel Aktivität</h3>
+              <div id="voice-activity-table">
+                <div class="loading">Lade Voice-Aktivitäten...</div>
+              </div>
+            </div>
+            
+            <div class="active-section">
+              <h3>Chat Aktivität (letzte 10 Minuten)</h3>
+              <div id="chat-activity-table">
+                <div class="loading">Lade Chat-Aktivitäten...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Benutzeraktivitäts-Protokoll -->
+      <section id="user-activity-log" class="tab-panel">
+        <h2>Benutzeraktivitäts-Protokoll</h2>
+        <div class="panel">
+          <div class="activity-controls">
+            <div class="filter-group">
+              <label for="activity-filter-type">Aktivitätstyp:</label>
+              <select id="activity-filter-type">
+                <option value="all">Alle Aktivitäten</option>
+                <option value="message">Nachrichten</option>
+                <option value="voice">Voice Aktivitäten</option>
+                <option value="role">Rollenänderungen</option>
+                <option value="presence">Statusänderungen</option>
+                <option value="username">Namensänderungen</option>
+                <option value="join">Server Join/Leave</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="activity-filter-user">Benutzer:</label>
+              <input type="text" id="activity-filter-user" placeholder="Benutzer suchen..." />
+            </div>
+            
+            <div class="filter-group">
+              <label for="activity-date-range">Zeitraum:</label>
+              <select id="activity-date-range">
+                <option value="1">Letzte 24 Stunden</option>
+                <option value="7">Letzte 7 Tage</option>
+                <option value="30">Letzte 30 Tage</option>
+                <option value="all" selected>Alle</option>
+              </select>
+            </div>
+            
+            <button id="apply-activity-filters" class="action-button">Filter anwenden</button>
+            <button id="export-activity-log" class="action-button">Exportieren (CSV)</button>
+          </div>
+          
+          <div class="activity-stats">
+            <div class="stat-box">
+              <span class="stat-number" id="total-activities">0</span>
+              <span class="stat-description">Gesamtaktivitäten</span>
+            </div>
+            <div class="activity-type-breakdown">
+              <div class="breakdown-item" id="message-count">
+                <div class="breakdown-label">Nachrichten</div>
+                <div class="breakdown-value">0</div>
+              </div>
+              <div class="breakdown-item" id="voice-count">
+                <div class="breakdown-label">Voice</div>
+                <div class="breakdown-value">0</div>
+              </div>
+              <div class="breakdown-item" id="role-count">
+                <div class="breakdown-label">Rollen</div>
+                <div class="breakdown-value">0</div>
+              </div>
+              <div class="breakdown-item" id="presence-count">
+                <div class="breakdown-label">Status</div>
+                <div class="breakdown-value">0</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="activity-timeline">
+            <h3>Aktivitäts-Timeline</h3>
+            <div id="activity-log-container"></div>
+            <div id="activity-load-more">
+              <button id="load-more-activities" class="action-button">Mehr laden</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alle Benutzer (Neuer Tab) -->
+      <section id="all-users" class="tab-panel">
+        <h2>Alle Benutzer in der Datenbank</h2>
+        <div class="panel">
+          <div class="all-users-controls">
+            <div class="search-group">
+              <label for="all-users-search">Suchen:</label>
+              <input type="text" id="all-users-search" placeholder="Benutzername, User-ID oder Tag suchen..." />
+              <button id="search-all-users" class="action-button">Suchen</button>
+            </div>
+          </div>
+          
+          <div class="all-users-stats">
+            <div class="stat-box">
+              <span class="stat-number" id="total-users-count">0</span>
+              <span class="stat-description">Benutzer in Datenbank</span>
+            </div>
+          </div>
+          
+          <div id="all-users-container">
+            <div class="loading">Lade Benutzer...</div>
+          </div>
+          
+          <div id="all-users-pagination">
+            <button id="load-more-users" class="action-button">Mehr laden</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alte Server -->
+      <section id="old-servers" class="tab-panel">
+        <h2>Alte Server</h2>
+        <div class="panel" id="old-servers-list"></div>
+      </section>
+
+      <!-- Bot Status -->
+      <section id="bot-status" class="tab-panel">
+        <h2>Bot Status ändern</h2>
+        <div class="panel">
+          <!-- Diese Form wird in BotStatusManager dynamisch generiert -->
+        </div>
+      </section>
+      
+      <!-- Konfiguration -->
+      <section id="config-editor" class="tab-panel">
+        <h2>Konfiguration bearbeiten</h2>
+        <div class="panel" id="config-editor">
+          <!-- Wird dynamisch in ConfigManager gefüllt -->
+        </div>
+      </section>
+
+      <!-- Bot Performance -->
+      <section id="performance" class="tab-panel">
+        <h2>Bot Performance</h2>
+        <div class="panel" id="performance-panel">
+          <div id="performance-data"></div>
+          <h3>Task Manager</h3>
+          <div id="task-manager">
+            <table id="task-manager-table">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Typ</th>
+                </tr>
+              </thead>
+              <tbody id="task-manager-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Socket.IO Library -->
+  <script src="{{socketIoSource}}"></script>
+  
+  <!-- Module Scripts - Reihenfolge ist wichtig! -->
+  <script src="/static/modules/serverManager.js"></script>
+  <script src="/static/modules/userStatusManager.js"></script>
+  <script src="/static/modules/userHistoryManager.js"></script>
+  <script src="/static/modules/activityManager.js"></script>
+  <script src="/static/modules/channelManager.js"></script>
+  <script src="/static/modules/serverStatsManager.js"></script>
+  <script src="/static/modules/activeUsersManager.js"></script>
+  <script src="/static/modules/allUsersManager.js"></script>
+  <script src="/static/modules/botStatusManager.js"></script>
+  <script src="/static/modules/configManager.js"></script>
+  <script src="/static/modules/historicalServersManager.js"></script>
+  <script src="/static/modules/storedLogsManager.js"></script>
+  <script src="/static/modules/liveEventsManager.js"></script>
+  <script src="/static/modules/performanceManager.js"></script>
+  <script src="/static/modules/rolesManager.js"></script>
+  <script src="/static/modules/auditLogManager.js"></script>
+  
+  <!-- Main Client Script - wird als letztes geladen -->
+  <script src="/static/client.js"></script>
+</body>
+</html>
